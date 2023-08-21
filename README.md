@@ -7,4 +7,4 @@ When it comes to cross-chain transactions, atomicity is very important. Any inco
 
 # Our Solution 
 
-We aim to solve this challenge in this project. This is a prototype of our solution, named SA-Xchain, which is a script-based directed acyclic graph generation for atomic cross-chain data operation. Our solution can guarantee the atomicity of cross-chain data transfer for multi-chain , as well as simplify cross-chain business development. This solution can be used for atomic and consistent data transfer, serving as middleware across multiple heterogeneous blockchain networks. 
+We aim to solve this challenge in this project. This is a prototype of our solution, named SA-Xchain, which is a script-based directed acyclic graph generation for atomic cross-chain data operation. Our solution can guarantee the atomicity of cross-chain data transfer, as well as simplify cross-chain business development. This solution can be used for atomic and consistent data transfer, serving as middleware across multiple heterogeneous blockchain networks. 
