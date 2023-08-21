@@ -1,0 +1,100 @@
+{
+  "chains" : {
+    "schoolA": {
+      "chain_id": "0x0001",
+      "desc": "A学校",
+      "data": {
+        "grade_1": "74",
+        "grade_2": "60",
+        "grade_3": "80",
+        "grade_4": "46",
+        "grade_5": "56",
+        "grade_6": "64"
+      }
+    },
+    "schoolB": {
+      "chain_id": "0x0002",
+      "desc": "B学校",
+      "data": {
+        "grade_1": "72",
+        "grade_2": "66",
+        "grade_3": "80",
+        "grade_4": "45",
+        "grade_5": "56",
+        "grade_6": "64"
+      }
+    },
+    "eduOrg": {
+      "chain_id": "0x0003",
+      "desc": "教育局",
+      "data": {
+      }
+    }
+  },
+  "tests": [
+    {
+      "desc": "颁给A学校",
+      "input": {
+        "year": "2022",
+        "level": "1"
+      },
+      "expect": {
+        "schoolA": {
+        },
+        "schoolB": {
+        },
+        "eduOrg": {
+          "excellence_2022_1": "A"
+        }
+      }
+    },
+    {
+      "desc": "B学校分数更高颁给B学校",
+      "input": {
+        "year": "2022",
+        "level": "2"
+      },
+      "expect": {
+        "schoolA": {
+        },
+        "schoolB": {
+        },
+        "eduOrg": {
+          "excellence_2022_2": "B"
+        }
+      }
+    },
+    {
+      "desc": "AB分数一样颁给B学校",
+      "input": {
+        "year": "2022",
+        "level": "3"
+      },
+      "expect": {
+        "schoolA": {
+        },
+        "schoolB": {
+        },
+        "eduOrg": {
+          "excellence_2022_3": "B"
+        }
+      }
+    },
+    {
+      "desc": "两边都很拉直接放弃",
+      "input": {
+        "year": "2022",
+        "level": "4"
+      },
+      "expect": {
+        "schoolA": {
+        },
+        "schoolB": {
+        },
+        "eduOrg": {
+          "excellence_2022_4": null
+        }
+      }
+    }
+  ]
+}

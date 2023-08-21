@@ -1,0 +1,165 @@
+{
+  "chains" : {
+    "fisher": {
+      "chain_id": "0x0000",
+      "desc": "渔业联盟链",
+      "read_time": 10,
+      "write_time": 2000,
+      "data": {
+        "00001_temperature": "12",
+        "00001_fish_type": "鲑鱼",
+        "00002_temperature": "6",
+        "00002_fish_type": "鲑鱼",
+        "00004_temperature": "-12",
+        "00004_fish_type": "鲱鱼",
+        "00006_temperature": "-12",
+        "00006_fish_type": "鲑鱼",
+        "00005_temperature": "3",
+        "00005_fish_type": "鲑鱼",
+        "00003_temperature": "6",
+        "00003_fish_type": "鲱鱼"
+      }
+    },
+    "factory": {
+      "chain_id": "0x0001",
+      "desc": "工厂联盟链",
+      "read_time": 10,
+      "write_time": 1000,
+      "data": {
+        "0010_canned_cost_day": "5",
+        "0010_directed_cut_cost_day": "1",
+        "0010_cold_cut_cost_day": "4",
+        "0011_canned_cost_day": "8",
+        "0011_directed_cut_cost_day": "1",
+        "0011_cold_cut_cost_day": "2"
+      }
+    },
+    "merchant": {
+      "chain_id": "0x0002",
+      "desc": "商家联盟链",
+      "read_time": 10,
+      "write_time": 3000,
+      "data": {
+        "0100_transport_time": "3",
+        "0101_transport_time": "2",
+        "0110_transport_time": "1"
+      }
+    }
+  },
+  "tests": [
+    {
+      "desc": "保存不当直接回滚",
+      "input": {
+        "factory_id": "0010",
+        "merchant_id": "0100",
+        "fish_id": "00001"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00001_process_method": null,
+          "00001_expect_send_time": null
+        },
+        "merchant": {
+          "00001_expect_receive_time": null
+        }
+      }
+    },
+    {
+      "desc": "温度较高进行罐装",
+      "input": {
+        "factory_id": "0010",
+        "merchant_id": "0100",
+        "fish_id": "00002"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00002_process_method": "罐装",
+          "00002_expect_send_time": "432000"
+        },
+        "merchant": {
+          "00002_expect_receive_time": "691200"
+        }
+      }
+    },
+    {
+      "desc": "温度较高的鲱鱼罐装",
+      "input": {
+        "factory_id": "0010",
+        "merchant_id": "0101",
+        "fish_id": "00003"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00003_process_method": "罐装",
+          "00003_expect_send_time": "432000"
+        },
+        "merchant": {
+          "00003_expect_receive_time": "604800"
+        }
+      }
+    },
+    {
+      "desc": "温度很低但是鲱鱼罐装",
+      "input": {
+        "factory_id": "0011",
+        "merchant_id": "0101",
+        "fish_id": "00004"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00004_process_method": "罐装",
+          "00004_expect_send_time": "691200"
+        },
+        "merchant": {
+          "00004_expect_receive_time": "864000"
+        }
+      }
+    },
+    {
+      "desc": "冷冻之后进行切割",
+      "input": {
+        "factory_id": "0011",
+        "merchant_id": "0110",
+        "fish_id": "00005"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00005_process_method": "冷切",
+          "00005_expect_send_time": "172800"
+        },
+        "merchant": {
+          "00005_expect_receive_time": "259200"
+        }
+      }
+    },
+    {
+      "desc": "直接进行切割",
+      "input": {
+        "factory_id": "0011",
+        "merchant_id": "0110",
+        "fish_id": "00006"
+      },
+      "expect": {
+        "fisher": {
+        },
+        "factory": {
+          "00006_process_method": "直切",
+          "00006_expect_send_time": "86400"
+        },
+        "merchant": {
+          "00006_expect_receive_time": "172800"
+        }
+      }
+    }
+  ]
+}

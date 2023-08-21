@@ -1,0 +1,170 @@
+{
+  "chains" : {
+    "rubber": {
+      "chain_id": "0x0000",
+      "desc": "橡胶联盟链",
+      "read_time": 10,
+      "write_time": 2000,
+      "data": {
+        "small_wheel_num": "10",
+        "big_wheel_num": "13"
+      }
+    },
+    "mechan": {
+      "chain_id": "0x0001",
+      "desc": "机械联盟链",
+      "read_time": 10,
+      "write_time": 1000,
+      "data": {
+        "high_chassis_num": "2",
+        "low_chassis_num": "3"
+      }
+    },
+    "car": {
+      "chain_id": "0x0002",
+      "desc": "汽车联盟链",
+      "read_time": 10,
+      "write_time": 3000,
+      "data": {
+        "base_a": "2",
+        "base_b": "1",
+        "base_c": "2",
+        "base_d": "1"
+      }
+    }
+  },
+  "tests": [
+    {
+      "desc": "制造A型底盘",
+      "input": {
+        "base_type": "base_a"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "6",
+          "big_wheel_num": "13"
+        },
+        "mechan": {
+          "high_chassis_num": "2",
+          "low_chassis_num": "2"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "1",
+          "base_c": "2",
+          "base_d": "1"
+        }
+      }
+    },
+    {
+      "desc": "制造B型底盘",
+      "input": {
+        "base_type": "base_b"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "2",
+          "big_wheel_num": "13"
+        },
+        "mechan": {
+          "high_chassis_num": "1",
+          "low_chassis_num": "2"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "2",
+          "base_c": "2",
+          "base_d": "1"
+        }
+      }
+    },
+    {
+      "desc": "制造C型底盘",
+      "input": {
+        "base_type": "base_c"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "2",
+          "big_wheel_num": "9"
+        },
+        "mechan": {
+          "high_chassis_num": "1",
+          "low_chassis_num": "1"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "2",
+          "base_c": "3",
+          "base_d": "1"
+        }
+      }
+    },
+    {
+      "desc": "制造D型底盘",
+      "input": {
+        "base_type": "base_d"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "2",
+          "big_wheel_num": "5"
+        },
+        "mechan": {
+          "high_chassis_num": "0",
+          "low_chassis_num": "1"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "2",
+          "base_c": "3",
+          "base_d": "2"
+        }
+      }
+    },
+    {
+      "desc": "制造D型底盘，但是无效果",
+      "input": {
+        "base_type": "base_d"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "2",
+          "big_wheel_num": "5"
+        },
+        "mechan": {
+          "high_chassis_num": "0",
+          "low_chassis_num": "1"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "2",
+          "base_c": "3",
+          "base_d": "2"
+        }
+      }
+    },
+    {
+      "desc": "制造A型底盘，但是无效果",
+      "input": {
+        "base_type": "base_a"
+      },
+      "expect": {
+        "rubber": {
+          "small_wheel_num": "2",
+          "big_wheel_num": "5"
+        },
+        "mechan": {
+          "high_chassis_num": "0",
+          "low_chassis_num": "1"
+        },
+        "car": {
+          "base_a": "3",
+          "base_b": "2",
+          "base_c": "3",
+          "base_d": "2"
+        }
+      }
+    }
+  ]
+}

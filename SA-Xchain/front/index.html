@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>模型测试</title>
+</head>
+<style type="text/css">
+	#topic {
+		width: 49%;
+		float: left;
+		
+	}
+	#code {
+		width: 49%;
+		float: right;
+	}
+	.border {
+		border: 1px solid;
+	}
+	.write-part {
+		height: 600px;
+	}
+	#operation-panel {
+		padding-top: 10px;
+		height: 100px;
+		padding-left: 10px;
+	}
+	#topic-view {
+		height: 95%;
+		width: 99%;
+	}
+	#code-edit {
+		/*margin-top: 5%;*/
+		height: 100%;
+		width: 99%;
+		/*margin-left: 5%;*/
+		/*height:100%; width: 100%; resize: none;outline:none; overflow-y: hidden; overflow-x: hidden; border: 0; background: rgb(247,247,247); color: #999;line-height: 24px;font-size: 14px; padding:10px 4px; text-align: right; font-weight: bold; box-sizing: border-box;*/
+	}
+	#result-panel {
+		margin-top: 10px;
+		height: 200px;
+	}
+	#write-panel {
+		height: 600px;
+	}
+	button {
+		background-color: white;
+		height: 50px;
+		width: 100px;
+		/*margin-right: 100px;*/
+	}
+	#tips {
+		/*float: right;*/
+		margin-left: 10px;
+	}
+	#tips-group {
+		width: 45%;
+		height: 80%;
+		float: left;
+	}
+	#button-group {
+		width: 50%;
+		text-align: right;
+		float: right;
+		/*padding-right: 5%;*/
+		margin-right: 2%;
+	}
+	#output-view {
+		width: 99%;
+		height: 160px;
+	}
+
+	.in, .out {
+		/*padding: 0;*/
+		/*margin: 0;*/
+		position: absolute;
+		/*border: 1px solid #ccc;*/
+		/*width: 350px;*/
+		/*height: 100px;*/
+		/*left: 10px;*/
+		/*top: 10px;*/
+		/*font-size: 14px;*/
+		height: 95%;
+		width: 99%;
+		z-index: 3;
+	}
+</style>
+<body>
+	<div id="app">
+		<div id="operation-panel" class="border">
+			<div id="tips-group" class="border">
+				<div id="tips" >提示：{{givenTips}}</div>
+			</div>
+			<div id="button-group">
+				<button @click="startRead" :disabled="status!=0">
+					开始场景阅读
+				</button>
+				<label :style="{color: status<1?'gray':'green'}">>>>>>>>></label>
+				<button @click="startCode" :disabled="status!=1">
+					阅读场景完毕
+				</button>
+				<label :style="{color: status<2?'gray':'green'}">>>>>>>>></label>
+				<button @click="startSubmit" :disabled="status!=2 && status !=3">
+					提交测试
+				</button>
+				<label :style="{color: status<4?'gray':'green'}">>>>>>>>></label>
+				<button @click="submitQuestionnaire" :disabled="status!=4">
+					提交结果
+				</button>
+			</div>
+
+
+		</div>
+		<div v-show="status==0">
+			<div>
+				<label>请填写您的测试码：</label>
+				<input v-model="usercode"/>
+			</div>
+		</div>
+		<div v-show="status >= 1 && status <= 3">
+			<div id="write-panel">
+				<div id="topic" class="write-part border">
+					场景描述：
+					<textarea id="topic-view" disabled="disabled">{{topic}}</textarea>
+
+
+				</div>
+				<div id="code" class="write-part border">
+
+					<textarea id="code-edit" :disabled="status<2" v-model="script">
+
+					</textarea>
+				</div>
+			</div>
+			<div class="border" id="result-panel">
+				<div>输出<button style="height:20px;width: 50px; font-size: 2px;" @click="clearOutput">清空</button> <div style="float:right; margin-right: 10px;">状态：{{result_status}}</div></div>
+				<div>
+					<textarea id="output-view" disabled="disabled">{{output}}</textarea>
+				</div>
+			</div>
+		</div>
+		<div v-show="status==4">
+			<h1>恭喜您通过全部用例</h1>
+		</div>
+		<div v-show="status==5">
+			<h1>感谢您的参与</h1>
+			<div v-for="report in reports">{{report}}</div>
+		</div>
+
+	</div>
+
+	
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="./vue.js"></script>
+<script type="text/javascript">
+
+	function getTime() {
+		return new Date().getTime();
+	}
+	// 提交问卷之后完成实验
+	new Vue({
+		el: "#app",
+		data: {
+			// 0-未开始 1-阅读题目 2-编写代码 3-尝试中 4-填写问卷 5-结束
+			status: 0,
+			// 用户标识码
+			usercode: "",
+			// 重要时间节点，格式：[状态，时间]
+			times: [],
+			// 题目描述
+			topic: "",
+			// 脚本代码
+			script: "",
+			// 输出
+			output: "",
+			// 结果状态
+			result_status: "",
+			// 报告
+			reports: []
+		},
+		methods: {
+			startRead: function() {
+				if (this.usercode.length <= 0) {
+					alert("请填写测试码再开始下一步");
+					return;
+				}
+				this.script = "";
+				let self = this;
+				// 查看测试码是否正确
+				// 请求场景内容描述
+				axios.get('/api/read_scene?usercode=' + self.usercode)
+						.then(res => {
+							if (res.data === "您的测试码不正确") {
+								alert(res.data);
+								return;
+							}
+							self.topic=res.data
+							// 进入读题状态
+							self.status = 1;
+							// 记录当前时间，开始读题
+							self.times.push([self.status, getTime()])
+						}).catch(err => {
+					console.log(err)
+				})
+			},
+			startCode: function() {
+				// 进入新的状态
+				this.status = 2
+				// 记录当前时间，开始编码
+				this.times.push([this.status, getTime()])
+			},
+			startSubmit: function() {
+				// 进行一次提交并更新状态
+				axios.post('/api/run_test', {usercode: this.usercode, code:
+				this.script})
+						.then(res => {
+							let result = res.data;
+							if (result.result === 2) {
+								// 编译失败
+								this.status = 3;
+								this.result_status = "编译失败:第" + result.compile_info[0] +"行";
+								this.output = result.compile_info[1] + "\n";
+								// 记录当前时间，进行了一次提交，且编译失败
+								this.times.push([this.status, getTime()])
+							} else if (result.result === 1) {
+								// 部分用例失败
+								this.status = 3;
+								this.result_status = "部分用例失败，通过" + result.count +"/" + result.all;
+								for (let i = 0; i < result.cases.length; i ++) {
+									let cas = result.cases[i];
+									if (cas.success) {
+										continue;
+									}
+									for (let j = 0; j < cas.output.length; j ++) {
+										let out = cas.output[j]
+										this.output += out + "\n";
+									}
+								}
+
+								// 记录当前时间，部分用例不通过
+								this.times.push([this.status, getTime()])
+							} else {
+								// 进入下一阶段
+								this.status = 4;
+								// 记录当前时间，通过全部用例
+								this.times.push([this.status, getTime()])
+								// 整理报告
+								for (let i = 1; i < this.times.length; i ++) {
+									let diff = (this.times[i][1] - this.times[i - 1][1]) / 1000;
+									if (this.times[i][0] === 1) {
+										this.reports.push("填写测试码耗时" + diff + "秒");
+									} else if (this.times[i][0] === 2) {
+										this.reports.push("阅读题目耗时" + diff + "秒");
+									} else {
+										this.reports.push("一次编码尝试耗时" + diff + "秒");
+									}
+								}
+							}
+
+						}).catch(err => {
+					console.log(err)
+				})
+			},
+			submitQuestionnaire: function () {
+				// 将时间和usercode一起发送给后台
+				let result = {"usercode": this.usercode, "times": this.times}
+				// 记录结果
+				axios.post('/api/record_result', {result: JSON.stringify(result)})
+						.then(res => {
+							let result = res.data;
+							if (result === "success") {
+								// 进入下一阶段
+								this.status = 5;
+							} else {
+								alert("提交出现了未知错误，请联系李昊明。。")
+							}
+						}).catch(err => {
+					console.log(err)
+				})
+			},
+			clearOutput: function() {
+				this.output = "";
+			}
+		},
+		computed: {
+			givenTips: function() {
+				switch (this.status) {
+					// 0-未开始 1-阅读题目 2-编写代码 3-尝试中 4-填写问卷 5-结束
+					case 0:
+						return "请填写测试码并点击开始场景阅读按钮，实验过程请不要中途退出，否则后台不会有记录，本实验在提交结果后结束";
+					case 1:
+						return "请确保理解了业务场景，当阅读完毕并准备编码时，点击阅读场景完毕";
+					case 2:
+						return "编码可以在本地vscode或者sublime等编辑器进行编辑(选择bash或者shell)后粘贴至右侧编辑栏或者直接在网页中" +
+								"右侧进行编写，" +
+								"当您认为编码完成时可以点击提交测试在后台进行测试执行，会将结果输出在下方的输出框中，如果所有测试均通过" +
+								"会跳转到记录提交界面。";
+					case 3:
+						return "您的代码没有通过全部用例，您可以查看输出的提示信息来进行修正，然后再次点击提交测试，直到代码通过全部测试用例" +
+								"为止。";
+					case 4:
+						return "恭喜您的代码通过了全部测试用例，点击右侧的提交结果来结束本次的实验。";
+					default:
+						return "您现在可以关闭此页面了";
+				}
+			}
+		}
+	})
+</script>
+</html>
